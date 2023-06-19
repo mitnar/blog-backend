@@ -14,6 +14,17 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+use App\Http\Controllers\PostController;
+use App\Http\Controllers\Auth\AuthController;
+
+Route::post('/auth/login', [AuthController::class, 'login']);
+
+Route::middleware('auth:sanctum')->group(function() {
+    Route::prefix('posts')->group(function() {
+        Route::resource('/', PostController::class);
+        Route::get('/recents', [PostController::class, 'getRecents']);
+        Route::get('/my', [PostController::class, 'getAuthorizedUserPosts']);
+    });
+
+    Route::post('/moderator/posts/{id}/block', [PostController::class, 'setBlocked']);
 });
